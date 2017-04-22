@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -12,26 +13,41 @@ import java.util.List;
 
 public class CCLogParser {
 	private List<List<Long>> times = new ArrayList<List<Long>>();
+	private String filename;
+	private String loginname;
+	private String dateStr;
 
-	public CCLogParser(String[] args) {
-
-		String loginname = "";
-
-		String filename = "C:\\Users\\" + System.getProperty("user.name") + "\\.controlgui\\logs\\app.log";
-
-		if (args.length > 0) {
-			filename = filename + "_" + args[0];
+	public CCLogParser() {
+		/*
+		 * filename =
+		 * "C:\\Users\\" + System.getProperty("user.name") + "\\.controlgui\\
+		 * logs\\app.log"; SimpleDateFormat dateFormatToday = new
+		 * SimpleDateFormat("yyyy-MM-dd"); this.dateStr =
+		 * dateFormatToday.format(new Date());
+		 */
+		LogFiles logFilesO = new LogFiles();
+		String[] logFiles = logFilesO.listFilesFromPath();
+		String logfilepath = logFilesO.getLogFilePath();
+		for (int i = 0; i < logFiles.length; i++) {
+			if (logFiles[i] != null) {
+				dateStr = logFilesO.getDateFromLogFile(logFiles[i]);
+				String fullfilename = logfilepath + "\\" + logFiles[i];
+				parseLogFile(fullfilename, dateStr);
+			}
 		}
 
-		System.out.println(filename);
+	}
+
+	public CCLogParser(String date) {
+		filename = "C:\\Users\\" + System.getProperty("user.name") + "\\.controlgui\\logs\\app.log" + "_" + date;
+		this.dateStr = date;
+		parseLogFile(filename, this.dateStr);
+	}
+
+	public void parseLogFile(String filename, String dateStr) {
+
+		// System.out.println(filename);
 		// int nameArg = filename.equals(args[0]) ? 1 : 0;
-
-		SimpleDateFormat dateFormatToday = new SimpleDateFormat("yyyy-MM-dd");
-		String dateStr = dateFormatToday.format(new Date());
-
-		if (args.length == 1) {
-			dateStr = args[0];
-		}
 
 		try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
 			String line;
@@ -46,7 +62,7 @@ public class CCLogParser {
 					if (line.contains("Login")) {
 						String[] splitline = line.split(" ");
 						loginname = splitline[7];
-						System.out.println("Login Name: " + loginname);
+						// System.out.println("Login Name: " + loginname);
 					}
 					if (line.contains("Login " + "mmueller5") || line.contains("ERROR ping")) {
 						temp = new ArrayList<Long>();
@@ -67,7 +83,6 @@ public class CCLogParser {
 							parsedDate = dateFormat.parse(cuts2[0]);
 							parsedMinTime = dateFormat.parse("08:00:00");
 
-							
 						} catch (ParseException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -89,6 +104,14 @@ public class CCLogParser {
 		}
 		calcTime(dateStr, times);
 	}
+	
+	private static String millisToHumanTime(long time)  {
+		String humanTime = null;
+		SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
+		humanTime = formatter.format(time);
+		// humanTime = String.valueOf((time / 1000) / 60);
+		return humanTime;
+	}
 
 	public static void calcTime(String datestr, List<List<Long>> times) {
 		String[] datum = datestr.split("-");
@@ -105,7 +128,7 @@ public class CCLogParser {
 			}
 			iter = 0;
 		}
-		System.out.println(datestr + ":\r\n" + ((t / 1000) / 60) + " Minuten geloggt = "
+		System.out.println(datestr + ":\r\n" + millisToHumanTime(t) + " Stunden geloggt = "
 				+ (float) (((t / 1000) / 60) / 45.0) + " UE's");
 
 	}

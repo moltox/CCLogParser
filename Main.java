@@ -21,7 +21,7 @@ public class Main {
 	public static void main(String[] args)  {
 		System.out.println("Aktueller Windows User: " + currentWindowsUser) ;
 		
-		CCLogParser ccLogParser = new CCLogParser(args);
+		CCLogParser ccLogParser = new CCLogParser();
 	
 	}
 }
