@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 public class CCLogParser {
-	private static List<List<Long>> times = new ArrayList<List<Long>>();
+	private List<List<Long>> times = new ArrayList<List<Long>>();
 
 	public CCLogParser(String[] args) {
 
@@ -42,7 +42,7 @@ public class CCLogParser {
 			while ((line = br.readLine()) != null) {
 
 				if (line.contains(dateStr)) {
-					
+
 					if (line.contains("Login")) {
 						String[] splitline = line.split(" ");
 						loginname = splitline[7];
@@ -59,16 +59,23 @@ public class CCLogParser {
 						// System.out.println(line);
 						String[] cuts = line.split(" ");
 						String[] cuts2 = cuts[1].split(",");
+
 						SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
 						Date parsedDate = null;
+						Date parsedMinTime = null;
 						try {
 							parsedDate = dateFormat.parse(cuts2[0]);
+							parsedMinTime = dateFormat.parse("08:00:00");
+
+							
 						} catch (ParseException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
-						temp.add(timestamp.getTime());
+						if (parsedDate.getTime() > parsedMinTime.getTime()) {
+							Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
+							temp.add(timestamp.getTime());
+						}
 					}
 				}
 			}
@@ -80,10 +87,10 @@ public class CCLogParser {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		calcTime(dateStr);
+		calcTime(dateStr, times);
 	}
 
-	public static void calcTime(String datestr) {
+	public static void calcTime(String datestr, List<List<Long>> times) {
 		String[] datum = datestr.split("-");
 		String datestrDE = datum[2] + '.' + datum[1] + '.' + datum[0];
 
