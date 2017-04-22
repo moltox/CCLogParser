@@ -17,11 +17,19 @@ public class CCLogParser {
 		String filename = args.length > 1 ? args[0]
 				: "C:\\Users\\" + System.getProperty("user.name") + "\\.controlgui\\logs\\app.log";
 		int nameArg = filename.equals(args[0]) ? 1 : 0;
+		
+		SimpleDateFormat dateFormatToday = new SimpleDateFormat("yyyy-MM-dd");
+		String dateStr = dateFormatToday.format(new Date());
+		
+		if(args.length == 3 ){
+			dateStr = args[2];
+		}
+		
 		try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
 			String line;
 			List<Long> temp = null;
-			SimpleDateFormat dateFormatToday = new SimpleDateFormat("yyyy-MM-dd");
-			String dateStr = dateFormatToday.format(new Date());
+			//SimpleDateFormat dateFormatToday = new SimpleDateFormat("yyyy-MM-dd");
+			//String dateStr = dateFormatToday.format(new Date());
 			while ((line = br.readLine()) != null) {
 				if (line.contains(dateStr)) {
 					if (line.contains("Login " + args[nameArg]) || line.contains("ERROR ping")) {
@@ -44,12 +52,13 @@ public class CCLogParser {
 			}
 			br.close();
 		}
-		calcTime();
+		calcTime(dateStr);
 	}
 
-	public static void calcTime() {
-		SimpleDateFormat dateFormatToday = new SimpleDateFormat("dd.MM.yyyy");
-		String dateStr = dateFormatToday.format(new Date());
+	public static void calcTime(String datestr) {
+		String[] datum = datestr.split("-");
+		String datestrDE = datum[2]+'.'+datum[1]+'.'+datum[0];
+				
 		long t = 0L;
 		int iter = 0;
 		for (List<Long> list : times) {
@@ -61,7 +70,7 @@ public class CCLogParser {
 			}
 			iter = 0;
 		}
-		System.out.println(dateStr+":\r\n"+((t / 1000) / 60) + 
+		System.out.println(datestrDE+":\r\n"+((t / 1000) / 60) + 
 				" Minuten geloggt = " + (float) (((t / 1000) / 60) / 45.0) + " UE's");
 	}
 }
