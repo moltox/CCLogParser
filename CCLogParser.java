@@ -64,7 +64,7 @@ public class CCLogParser {
 						loginname = splitline[7];
 						// System.out.println("Login Name: " + loginname);
 					}
-					if (line.contains("Login " + "mmueller5") || line.contains("ERROR ping")) {
+					if (line.contains("Login " + loginname) || line.contains("ERROR ping")) {
 						temp = new ArrayList<Long>();
 						times.add(temp);
 					}
